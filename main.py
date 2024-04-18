@@ -24,30 +24,33 @@ def handle_city(message):
     get_city_name(message)
 
 
-
-def get_city_name(message):
-    print('Вызывана функция')
-    city_name = message.text
+def get_coordinates_url(city_name):
     translator = Translator()
     city_name = str(translator.translate(city_name).text)
+    url = (f'{CITY_COORDINATES_BASE_URL}{city_name}')
+    return url
 
+
+def get_map_url(city_name, latitude, longitude):
+    return (f'{MAPS_BASE_URL}{city_name}/@{latitude}{longitude}')
+
+
+def get_city_name(message):
+    city_name = message.text
+    coordinates_url = get_coordinates_url(city_name)
     query_params = {
         'apikey': CITY_COORDINATES_KEY
     }
-    url = (f'{CITY_COORDINATES_BASE_URL}{city_name}')
-    response = requests.get(url, params=query_params)
+    response = requests.get(coordinates_url, params=query_params)
 
     if response.status_code == 200:
         data = response.json()
-
         latitude = data[0].get('latitude')
         longitude = data[0].get('longitude')
-        map_url = (f'{MAPS_BASE_URL}{city_name}/@'
-                    f'{latitude}{longitude}')
-        map_link = (map_url)
+        map_url = get_map_url(city_name, latitude, longitude)
         msg_text = (
             f'Город {city_name} расположен по следующим координатам:\n'
-            f'Широта: {latitude}\nДолгота: {longitude}.Ссылка: {map_link}'
+            f'Широта: {latitude}\nДолгота: {longitude}.Ссылка: {map_url}'
         )
         bot.reply_to(message, msg_text)
     else:
