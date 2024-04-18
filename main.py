@@ -20,6 +20,11 @@ def send_welcome(message):
     bot.register_next_step_handler(messg, get_city_name)
 
 
+@bot.message_handler(func=lambda m: True)
+def handle_city(message):
+    bot.register_next_step_handler(message, get_city_name)
+
+
 def get_city_name(message):
     city_name = message.text
     translator = Translator()
@@ -42,6 +47,8 @@ def get_city_name(message):
             f'Широта: {latitude}\nДолгота: {longitude}.'
         )
         bot.reply_to(message, msg_text)
+    else:
+        bot.reply_to(message, f'Город {city_name} не найден')
 
 
 def main():
