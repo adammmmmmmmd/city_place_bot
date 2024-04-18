@@ -1,5 +1,5 @@
 import requests
-
+from googletrans import Translator, constants
 import telebot
 
 from config import TELEGRAM_TOKEN, CITY_COORDINATES_KEY, CITY_COORDINATES_BASE_URL
@@ -22,6 +22,8 @@ def send_welcome(message):
 
 def get_city_name(message):
     city_name = message.text
+    translator = Translator()
+    city_name = str(translator.translate(city_name).text)
     bot.send_message(message.chat.id, 'Получено. Ищу координаты.')
     print(city_name)
     query_params = {
