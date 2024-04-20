@@ -1,11 +1,19 @@
 import requests
 from googletrans import Translator
 import telebot
+import telebot.apihelper
 
 from config import TELEGRAM_TOKEN, CITY_COORDINATES_KEY, CITY_COORDINATES_BASE_URL, MAPS_BASE_URL
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
+try:
+    bot_info = bot.get_me()
+    print(bot_info)
+except telebot.apihelper.ApiTelegramException:
+    print("Ошибка токена, проверьте его на правильность")
+else:
+    print("Бот авторизован")
 
 @bot.message_handler(commands=['help', 'start'])
 def send_welcome(message):
@@ -31,18 +39,22 @@ def get_coordinates_url(city_name):
     return url
 
 
+def get_city_info(city_name):
+    url = get_coordinates_url(city_name)
+    query_params = {
+        'apikey': CITY_COORDINATES_KEY
+    }
+    response = requests.get(url, params=query_params)
+    return response
+
+
 def get_map_url(city_name, latitude, longitude):
     return (f'{MAPS_BASE_URL}{city_name}/@{latitude}{longitude}')
 
 
 def get_city_name(message):
     city_name = message.text
-    coordinates_url = get_coordinates_url(city_name)
-    query_params = {
-        'apikey': CITY_COORDINATES_KEY
-    }
-    response = requests.get(coordinates_url, params=query_params)
-
+    response = get_city_info(city_name)
     if response.status_code == 200:
         data = response.json()
         latitude = data[0].get('latitude')
@@ -50,7 +62,7 @@ def get_city_name(message):
         map_url = get_map_url(city_name, latitude, longitude)
         msg_text = (
             f'Город {city_name} расположен по следующим координатам:\n'
-            f'Широта: {latitude}\nДолгота: {longitude}.Ссылка: {map_url}'
+            f'Широта: {latitude}\nДолгота: {longitude}.\nСсылка: {map_url}'
         )
         bot.reply_to(message, msg_text)
     else:
