@@ -9,11 +9,12 @@ bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 try:
     bot_info = bot.get_me()
-    print(bot_info)
 except telebot.apihelper.ApiTelegramException:
     print("Ошибка токена, проверьте его на правильность")
+    bot.stop_bot()
 else:
     print("Бот авторизован")
+
 
 @bot.message_handler(commands=['help', 'start'])
 def send_welcome(message):
@@ -49,11 +50,12 @@ def get_city_info(city_name):
 
 
 def get_map_url(city_name, latitude, longitude):
-    return (f'{MAPS_BASE_URL}{city_name}/@{latitude}{longitude}')
+    return (f'{MAPS_BASE_URL}{city_name}/@{latitude},{longitude}')
 
 
 def get_city_name(message):
     city_name = message.text
+    # try: проверка на респонс
     response = get_city_info(city_name)
     if response.status_code == 200:
         data = response.json()
