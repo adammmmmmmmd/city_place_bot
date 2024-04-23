@@ -53,13 +53,23 @@ def get_map_url(city_name, latitude, longitude):
     return f'{MAPS_BASE_URL}{city_name}/@{latitude},{longitude}'
 
 
+def send_search_failed(message):
+    text = 'Не удалось получить данные'
+    bot.reply_to(message, text)
+    exit()
+
+
 def get_city_name(message):
     city_name = message.text
     response = get_city_info(city_name)
     if response.status_code == 200:
         data = response.json()
-        latitude = data[0].get('latitude')
-        longitude = data[0].get('longitude')
+        try:
+            latitude = data[0].get('latitude')
+            longitude = data[0].get('longitude')
+        except IndexError:
+            print('Элемент не найден')
+            send_search_failed(message)
         map_url = get_map_url(city_name, latitude, longitude)
         msg_text = (
             f'Город {city_name} расположен по следующим координатам:\n'
