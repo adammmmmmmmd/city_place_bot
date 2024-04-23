@@ -1,13 +1,13 @@
-import requests
 from googletrans import Translator
+import requests
 import telebot
 import telebot.apihelper
 
 from config import TELEGRAM_TOKEN, CITY_COORDINATES_KEY, CITY_COORDINATES_BASE_URL, MAPS_BASE_URL
 
-bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 try:
+    bot = telebot.TeleBot(TELEGRAM_TOKEN)
     bot_info = bot.get_me()
 except telebot.apihelper.ApiTelegramException:
     print("Ошибка токена, проверьте его на правильность")
@@ -36,7 +36,7 @@ def handle_city(message):
 def get_coordinates_url(city_name):
     translator = Translator()
     city_name = str(translator.translate(city_name).text)
-    url = (f'{CITY_COORDINATES_BASE_URL}{city_name}')
+    url = f'{CITY_COORDINATES_BASE_URL}{city_name}'
     return url
 
 
@@ -50,12 +50,11 @@ def get_city_info(city_name):
 
 
 def get_map_url(city_name, latitude, longitude):
-    return (f'{MAPS_BASE_URL}{city_name}/@{latitude},{longitude}')
+    return f'{MAPS_BASE_URL}{city_name}/@{latitude},{longitude}'
 
 
 def get_city_name(message):
     city_name = message.text
-    # try: проверка на респонс
     response = get_city_info(city_name)
     if response.status_code == 200:
         data = response.json()
