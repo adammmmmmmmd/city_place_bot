@@ -18,6 +18,9 @@ else:
 
 @bot.message_handler(commands=['help', 'start'])
 def send_welcome(message):
+    """Отправляет пользователю два сообщения: приветствие, 
+    а также просьбу отправить название города.
+    """
     text = (
         f'Привет! Этот бот позволяет узнать координаты '
         f'нужного вам города.'
@@ -29,11 +32,17 @@ def send_welcome(message):
 
 @bot.message_handler(func=lambda m: True)
 def handle_city(message):
+    """Ожидает сообщение пользователя. При получении сообщения отправляет
+    пользователю сообщение с информацией о начале поиска.
+    """
     bot.send_message(message.chat.id, 'Получено. Ищу координаты.')
     get_city_name(message)
 
 
 def get_coordinates_url(city_name):
+    """Переводит название города на английский. Составляет url для 
+    последующего осуществления запроса.
+    """
     translator = Translator()
     city_name = str(translator.translate(city_name).text)
     url = f'{CITY_COORDINATES_BASE_URL}{city_name}'
@@ -41,6 +50,7 @@ def get_coordinates_url(city_name):
 
 
 def get_city_info(city_name):
+    """Запрашивает данные через api с помощью url."""
     url = get_coordinates_url(city_name)
     query_params = {
         'apikey': CITY_COORDINATES_KEY
@@ -50,16 +60,24 @@ def get_city_info(city_name):
 
 
 def get_map_url(city_name, latitude, longitude):
+    """Возвращает url адрес googlemaps для 
+    запрашиваемого города и его координат.
+    """
     return f'{MAPS_BASE_URL}{city_name}/@{latitude},{longitude}'
 
 
 def send_search_failed(message):
+    """Отправляет пользователю сообщение об неудачном получении данных.
+    """
     text = 'Не удалось получить данные'
     bot.reply_to(message, text)
     exit()
 
 
 def get_city_name(message):
+    """Формирует и отправляет пользователю ответ о поиске запрошенного 
+    города в зависимости от успешности поиска.
+    """
     city_name = message.text
     response = get_city_info(city_name)
     if response.status_code == 200:
