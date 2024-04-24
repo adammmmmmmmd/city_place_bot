@@ -6,7 +6,7 @@
 
 ## Installation
 
-1. Получите бесплатный API ключ по ссылке https://apilayer.com/marketplace/geo-api \
+1. Получите бесплатный API ключ по ссылке https://apilayer.com/marketplace/geo-api 
 2. Получите токен для своего telegram бота по ссылке https://t.me/BotFather
 3. Клонируйте репозиторий 
 ```
